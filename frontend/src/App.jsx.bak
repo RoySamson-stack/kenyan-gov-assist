@@ -1,0 +1,318 @@
+import { useState } from 'react';
+import { Send, Sparkles, BookOpen, Building2, MapPin, FileText, Globe } from 'lucide-react';
+
+function App() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState('english');
+
+  const languages = [
+    { code: 'english', label: 'English', flag: '🇬🇧' },
+    { code: 'swahili', label: 'Kiswahili', flag: '🇰🇪' },
+  ];
+
+  const quickActions = [
+    {
+      icon: FileText,
+      title: 'Constitution & Laws',
+      prompt: 'What are my constitutional rights in Kenya?',
+      gradient: 'from-blue-500 to-cyan-500',
+    },
+    {
+      icon: Building2,
+      title: 'Business Registration',
+      prompt: 'How do I register a business in Kenya?',
+      gradient: 'from-purple-500 to-pink-500',
+    },
+    {
+      icon: MapPin,
+      title: 'Land Rights',
+      prompt: 'What are the requirements for a land title deed?',
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      icon: BookOpen,
+      title: 'Permits & Licenses',
+      prompt: 'What licenses do I need to start a restaurant?',
+      gradient: 'from-orange-500 to-red-500',
+    },
+  ];
+
+  const sendMessage = async (customPrompt = null) => {
+    const messageText = customPrompt || input;
+    if (!messageText.trim()) return;
+
+    const userMessage = { role: 'user', content: messageText };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: messageText, language }),
+      });
+
+      const data = await response.json();
+      const assistantMessage = { role: 'assistant', content: data.response };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+      {/* Header */}
+      <header className="relative bg-gradient-to-r from-green-600 via-green-700 to-emerald-600 text-white shadow-lg overflow-hidden">
+        <div className="absolute inset-0 bg-black opacity-5"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-300 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        </div>
+        
+        <div className="relative max-w-6xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                <Sparkles className="w-6 h-6 text-yellow-300" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold flex items-center gap-2">
+                  Serikali Yangu
+                  <span className="text-lg">🇰🇪</span>
+                </h1>
+                <p className="text-green-100 text-sm flex items-center gap-1.5 mt-0.5">
+                  <Globe className="w-3.5 h-3.5" />
+                  Your AI Government Assistant
+                </p>
+              </div>
+            </div>
+
+            {/* Language Selector */}
+            <div className="flex gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-1">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    language === lang.code
+                      ? 'bg-white text-green-700 shadow-sm'
+                      : 'text-white hover:bg-white/10'
+                  }`}
+                >
+                  <span className="mr-1.5">{lang.flag}</span>
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Chat Container */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {messages.length === 0 ? (
+              <div className="space-y-8 animate-fade-in">
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl shadow-lg mb-6 animate-bounce-slow">
+                    <Sparkles className="w-10 h-10 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-3">
+                    Karibu! Welcome! 👋
+                  </h2>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    Ask me anything about Kenyan government services, laws, permits, and policies
+                  </p>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {quickActions.map((action, i) => (
+                    <button
+                      key={i}
+                      onClick={() => sendMessage(action.prompt)}
+                      className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-transparent transition-all duration-300 text-left overflow-hidden"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}></div>
+                      <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br ${action.gradient} rounded-xl mb-4 group-hover:scale-110 transition-transform`}>
+                        <action.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="font-semibold text-gray-800 mb-2 group-hover:text-gray-900">
+                        {action.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 line-clamp-2">
+                        {action.prompt}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Features */}
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl mb-1">⚡</div>
+                      <div className="text-xs font-medium text-gray-700">Instant Answers</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl mb-1">🔒</div>
+                      <div className="text-xs font-medium text-gray-700">100% Private</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl mb-1">📚</div>
+                      <div className="text-xs font-medium text-gray-700">Official Sources</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-slide-up`}
+                  >
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-5 py-4 shadow-sm ${
+                        msg.role === 'user'
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-br-md'
+                          : 'bg-white text-gray-800 rounded-bl-md border border-gray-100'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {loading && (
+              <div className="flex justify-start animate-slide-up">
+                <div className="bg-white rounded-2xl rounded-bl-md px-5 py-4 border border-gray-100 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="flex space-x-1.5">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-150"></div>
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce delay-300"></div>
+                    </div>
+                    <span className="text-sm text-gray-500">Thinking...</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Input */}
+      <div className="border-t border-gray-200 bg-white/80 backdrop-blur-lg p-4 shadow-lg">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-3">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !loading && sendMessage()}
+                placeholder="Ask about laws, permits, business registration..."
+                className="w-full border-2 border-gray-200 rounded-2xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent placeholder:text-gray-400 transition-all shadow-sm"
+                disabled={loading}
+              />
+              {input && (
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                  {input.length}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => sendMessage()}
+              disabled={loading || !input.trim()}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl px-6 py-4 flex items-center justify-center hover:from-green-700 hover:to-emerald-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+            >
+              <Send size={20} className="text-white" />
+            </button>
+          </div>
+          <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+            <p className="flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              AI-powered responses • Verify with official sources
+            </p>
+            <p>Powered by Ollama</p>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+
+        .animate-bounce-slow {
+          animation: bounce-slow 2s ease-in-out infinite;
+        }
+
+        .delay-150 {
+          animation-delay: 0.15s;
+        }
+
+        .delay-300 {
+          animation-delay: 0.3s;
+        }
+
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default App;

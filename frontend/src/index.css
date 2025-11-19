@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :root {
+    color: #f8fafc;
+    background-color: #020617;
+  }
+
+  body {
+    @apply min-h-screen bg-slate-950 text-slate-100 font-sans antialiased;
+    margin: 0;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+}
