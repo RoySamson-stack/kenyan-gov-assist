@@ -1,0 +1,5 @@
+# This directory stores the ChromaDB vector database
+# It is ignored by git but this file preserves the directory structure
+# Run the ingestion script to populate this directory:
+# cd backend && python scripts/ingest_documents.py --reset --directory ../data/raw
+

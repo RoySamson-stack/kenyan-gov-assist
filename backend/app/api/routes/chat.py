@@ -5,6 +5,7 @@ Chat API routes with RAG integration
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
+from app.config import settings
 from app.services.rag_service import RAGService
 import logging
 
@@ -21,6 +22,7 @@ class ChatRequest(BaseModel):
     language: str = "english"
     use_rag: bool = True  # Toggle RAG on/off
     document_type: Optional[str] = None  # Filter by document type
+    domain: str = settings.DEFAULT_DOMAIN
 
 
 class Source(BaseModel):
@@ -36,6 +38,7 @@ class ChatResponse(BaseModel):
     language: str
     status: str
     retrieved_chunks: Optional[int] = None
+    domain: str = settings.DEFAULT_DOMAIN
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -50,14 +53,23 @@ async def chat(request: ChatRequest):
         ChatResponse with answer and source citations
     """
     try:
-        logger.info(f"Chat request: '{request.message}' (RAG: {request.use_rag}, Lang: {request.language})")
+        logger.info(
+            "Chat request: '%s' (RAG: %s, Lang: %s, Domain: %s)",
+            request.message,
+            request.use_rag,
+            request.language,
+            request.domain,
+        )
+        domain = request.domain if request.domain in settings.SUPPORTED_DOMAINS else settings.DEFAULT_DOMAIN
         
         if request.use_rag:
             # Use RAG to answer from documents
             result = await rag_service.query(
                 question=request.message,
                 n_results=3,
-                document_type=request.document_type
+                document_type=request.document_type,
+                domain=domain,
+                target_language=request.language
             )
             
             # Convert sources to Source objects
@@ -76,7 +88,8 @@ async def chat(request: ChatRequest):
                 sources=sources,
                 language=request.language,
                 status=result['status'],
-                retrieved_chunks=result.get('retrieved_chunks', 0)
+                retrieved_chunks=result.get('retrieved_chunks', 0),
+                domain=domain
             )
         else:
             # Direct Ollama call without RAG (fallback)
@@ -85,14 +98,15 @@ async def chat(request: ChatRequest):
             
             response = await ollama.generate(
                 prompt=request.message,
-                system_prompt="You are a helpful assistant for Kenyan government services."
+                system_prompt=rag_service.create_system_prompt(domain)
             )
             
             return ChatResponse(
                 response=response,
                 sources=[],
                 language=request.language,
-                status="direct_ollama"
+                status="direct_ollama",
+                domain=domain
             )
     
     except Exception as e:

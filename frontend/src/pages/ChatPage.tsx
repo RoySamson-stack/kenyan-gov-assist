@@ -1,40 +1,49 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import type { ChatMessage, MessageSource } from "../types/chat";
 import { v4 as uuid } from "uuid";
 import {
   ChatInput,
   EmptyState,
-  Header,
   MessageList,
   TypingIndicator,
 } from "../components";
-import { theme } from "../styles/theme";
 
 const languages = [
   { code: "english", label: "English" },
   { code: "swahili", label: "Kiswahili" },
+  { code: "kikuyu", label: "Gĩkũyũ" },
 ];
 
-const documentFilters = [
-  { id: "all", label: "All documents" },
-  { id: "constitution", label: "Constitution" },
-  { id: "business", label: "Business" },
-  { id: "permits", label: "Permits & licenses" },
-  { id: "land", label: "Land & housing" },
-];
+const domainOptions = [
+  {
+    id: "civic",
+    label: "Serikali Yangu",
+    description: "Government & citizen services",
+  },
+  {
+    id: "health",
+    label: "AfyaTranslate",
+    description: "Clinician ↔ patient support",
+  },
+] as const;
 
 export const ChatPage = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<string>("english");
-  const [documentFilter, setDocumentFilter] = useState<string>("all");
+  const [domain, setDomain] = useState<(typeof domainOptions)[number]["id"]>("civic");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const activeDocumentType = useMemo(
-    () => (documentFilter === "all" ? undefined : documentFilter),
-    [documentFilter]
-  );
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
 
   const sendMessage = useCallback(
     async (customPrompt?: string) => {
@@ -55,14 +64,14 @@ export const ChatPage = () => {
       setLoading(true);
 
       try {
-        const response = await fetch("http://localhost:8000/api/chat", {
+        const response = await fetch("http://localhost:8001/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: content,
             language,
             use_rag: true,
-            document_type: activeDocumentType,
+            domain,
           }),
         });
 
@@ -97,7 +106,7 @@ export const ChatPage = () => {
         setLoading(false);
       }
     },
-    [activeDocumentType, input, language, loading]
+    [domain, input, language, loading]
   );
 
   const handleSubmit = () => {
@@ -109,90 +118,90 @@ export const ChatPage = () => {
   };
 
   return (
-    <div
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-white"
-      style={{ backgroundImage: theme.colors.background }}
-    >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-[20%] top-[15%] h-[420px] w-[420px] rounded-full bg-blue-500/40 blur-[160px]" />
-        <div className="absolute bottom-[10%] right-[12%] h-[360px] w-[360px] rounded-full bg-sky-400/30 blur-[140px]" />
-        <div className="absolute left-[25%] top-[40%] h-[300px] w-[300px] rounded-full bg-indigo-500/35 blur-[160px]" />
+    <div className="flex h-screen flex-col bg-slate-950 text-white">
+      {/* Top Header - Minimal */}
+      <div className="border-b border-white/10 bg-slate-950/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-4">
+            <h1 className="text-lg font-semibold">
+              {domain === "civic" ? "Serikali Yangu" : "AfyaTranslate AI"}
+            </h1>
+            <div className="flex gap-2">
+              {domainOptions.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setDomain(item.id)}
+                  className={clsx(
+                    "rounded-lg px-3 py-1.5 text-xs font-medium transition",
+                    domain === item.id
+                      ? "bg-white/10 text-white"
+                      : "text-white/60 hover:text-white/80"
+                  )}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {languages.map((item) => (
+              <button
+                key={item.code}
+                type="button"
+                onClick={() => setLanguage(item.code)}
+                className={clsx(
+                  "rounded-lg px-3 py-1.5 text-xs font-medium transition",
+                  language === item.code
+                    ? "bg-white/10 text-white"
+                    : "text-white/60 hover:text-white/80"
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-10">
-        <Header
-          title="Serikali Yangu"
-          subtitle="Get instant guidance on Kenyan government services, rights, and resources"
-        />
+      {/* Main Chat Area - Centered like ChatGPT */}
+      <div
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto"
+        style={{ scrollbarWidth: "thin" }}
+      >
+        <div className="mx-auto max-w-3xl px-4 py-8">
+          {messages.length === 0 ? (
+            <EmptyState onSelect={handleSuggestionSelect} />
+          ) : (
+            <MessageList messages={messages} />
+          )}
+          {loading && (
+            <div className="mt-6">
+              <TypingIndicator />
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </div>
 
-        <section className="rounded-[28px] border border-white/10 bg-white/5 p-5 text-white shadow-[0_24px_80px_rgba(12,10,29,0.65)] backdrop-blur-2xl">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-white/60">Language</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {languages.map((item) => (
-                  <button
-                    key={item.code}
-                    type="button"
-                    onClick={() => setLanguage(item.code)}
-                    className={clsx(
-                      "rounded-full border px-4 py-2 text-sm font-medium transition",
-                      language === item.code
-                        ? "border-white/50 bg-white/20 text-white"
-                        : "border-white/10 text-white/70 hover:border-white/40"
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-white/60">Document focus</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {documentFilters.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setDocumentFilter(item.id)}
-                    className={clsx(
-                      "rounded-full border px-4 py-2 text-sm font-medium transition",
-                      documentFilter === item.id
-                        ? "border-emerald-300/80 bg-emerald-400/20 text-white"
-                        : "border-white/10 text-white/70 hover:border-white/40"
-                    )}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="flex-1 overflow-hidden rounded-[32px] border border-white/10 bg-slate-950/40 p-6 shadow-[0_30px_80px_rgba(15,23,42,0.45)] backdrop-blur-2xl">
-          <div className="flex h-full flex-col gap-6">
-            <div className="flex-1 overflow-y-auto pr-3">
-              {messages.length ? (
-                <MessageList messages={messages} />
-              ) : (
-                <EmptyState onSelect={handleSuggestionSelect} />
-              )}
-              {loading && (
-                <div className="mt-6">
-                  <TypingIndicator />
-                </div>
-              )}
-            </div>
-            <ChatInput value={input} onChange={setInput} onSubmit={handleSubmit} disabled={loading} />
-            <div className="flex flex-col gap-2 text-center text-[12px] text-white/50">
-              <p>Responses cite official Kenyan documents when available.</p>
-              <p>Always verify important information through official portals.</p>
-            </div>
-          </div>
-        </section>
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-6 py-4 text-center text-sm text-white/70">
-          Powered by Ollama • Backed by Kenyan government PDFs • Last sync via ingestion script
+      {/* Input Area - Fixed at bottom */}
+      <div className="border-t border-white/10 bg-slate-950/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-3xl px-4 py-4">
+          <ChatInput
+            value={input}
+            onChange={setInput}
+            onSubmit={handleSubmit}
+            disabled={loading}
+            placeholder={
+              domain === "civic"
+                ? "Ask about Kenyan government services..."
+                : "Ask about health, symptoms, or medical information..."
+            }
+          />
+          <p className="mt-2 text-center text-xs text-white/40">
+            Powered by Ollama • Responses cite official documents when available
+          </p>
         </div>
       </div>
     </div>

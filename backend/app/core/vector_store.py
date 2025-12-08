@@ -111,6 +111,17 @@ class VectorStore:
             logger.error(f"Error adding documents: {e}")
             raise
     
+    def update_metadatas(self, ids: List[str], metadatas: List[Dict[str, Any]]) -> None:
+        """Update metadata for existing documents."""
+        if not ids:
+            return
+        try:
+            self.collection.update(ids=ids, metadatas=metadatas)
+            logger.info("Updated metadata for %d ids", len(ids))
+        except Exception as exc:
+            logger.error("Failed to update metadata: %s", exc)
+            raise
+    
     def search(
         self,
         query: str,

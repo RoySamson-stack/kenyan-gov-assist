@@ -1,0 +1,4 @@
+# This directory stores processed document chunks
+# It is automatically populated by the ingestion script
+# Keep metadata.json for tracking, but chunks are regenerated
+

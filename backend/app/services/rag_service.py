@@ -27,7 +27,9 @@ class RAGService:
         self,
         query: str,
         n_results: int = 3,
-        document_type: Optional[str] = None
+        document_type: Optional[str] = None,
+        domain: Optional[str] = None,
+        target_language: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant documents
@@ -44,8 +46,12 @@ class RAGService:
         
         # Build filter if document type specified
         filter_metadata = None
-        if document_type:
-            filter_metadata = {"document_type": document_type}
+        if document_type or domain:
+            filter_metadata = {}
+            if document_type:
+                filter_metadata["document_type"] = document_type
+            if domain:
+                filter_metadata["domain"] = domain
         
         # Search vector store
         results = self.vector_store.search(
@@ -63,8 +69,12 @@ class RAGService:
                 results['metadatas'][0],
                 results['distances'][0]
             ):
+                translations = metadata.get('translations', {}) if isinstance(metadata, dict) else {}
+                display_content = doc
+                if target_language and isinstance(translations, dict):
+                    display_content = translations.get(target_language, doc)
                 formatted_results.append({
-                    'content': doc,
+                    'content': display_content,
                     'metadata': metadata,
                     'relevance_score': 1 - distance,  # Convert distance to similarity
                     'source': metadata.get('source', 'Unknown'),
@@ -102,34 +112,50 @@ class RAGService:
         context = "\n---\n".join(context_parts)
         return context
     
-    def create_system_prompt(self) -> str:
-        """Create system prompt for the government assistant"""
-        return """You are Serikali Yangu, an AI assistant for Kenyan government information.
+    def create_system_prompt(self, domain: str = settings.DEFAULT_DOMAIN) -> str:
+        """Return a domain-aware system prompt."""
+        civic_prompt = """You are Serikali Yangu, an AI assistant for Kenyan government information.
 
 Your role:
-- Answer questions about Kenyan laws, policies, and government services
-- Provide accurate information based on official government documents
-- Always cite your sources when providing information
-- Be helpful, clear, and respectful
-- Use simple language that citizens can understand
+- Answer questions about Kenyan laws, policies, and government services.
+- Provide accurate information based on official government documents.
+- Always cite your sources when providing information.
+- Be helpful, clear, and respectful.
+- Use simple language that citizens can understand.
 
 Important rules:
-1. ONLY use information from the provided documents
-2. ALWAYS cite which document and page your answer comes from
-3. If the documents don't contain the answer, say so clearly
-4. Never make up information
-5. If a question is unclear, ask for clarification
+1. ONLY use information from the provided documents.
+2. ALWAYS cite which document and page your answer comes from.
+3. If the documents don't contain the answer, say so clearly.
+4. Never make up information.
+5. If a question is unclear, ask for clarification.
 
 Format your answers like this:
-- Start with a direct answer
-- Provide relevant details
-- End with source citations in brackets like [Source: constitution.pdf, Page 5]
+- Start with a direct answer.
+- Provide relevant details.
+- End with source citations in brackets like [Source: constitution.pdf, Page 5].
 """
+        health_prompt = """You are AfyaTranslate, a Kenyan healthcare language assistant.
+
+Your role:
+- Support clinicians and patients by translating and explaining medical information accurately.
+- Use compassionate language and prioritize patient safety.
+- Reference Kenyan Ministry of Health guidance and provided medical documents.
+- Highlight critical instructions (dosage, follow-up) clearly.
+
+Important rules:
+1. Stick to the provided medical context; avoid speculation.
+2. Flag emergencies if symptoms sound life threatening and recommend immediate care.
+3. Use simple, culturally sensitive explanations.
+4. Cite the source document or phrase pack when possible.
+"""
+        return health_prompt if domain == "health" else civic_prompt
     
     def create_prompt_with_context(
         self,
         query: str,
-        context: str
+        context: str,
+        domain: str = settings.DEFAULT_DOMAIN
     ) -> str:
         """
         Create the full prompt with context for the LLM
@@ -141,7 +167,8 @@ Format your answers like this:
         Returns:
             Formatted prompt
         """
-        prompt = f"""Context from Kenyan government documents:
+        domain_label = "healthcare guidance" if domain == "health" else "government documents"
+        prompt = f"""Context from Kenyan {domain_label}:
 
 {context}
 
@@ -190,7 +217,9 @@ Answer:"""
         self,
         question: str,
         n_results: int = 3,
-        document_type: Optional[str] = None
+        document_type: Optional[str] = None,
+        domain: str = settings.DEFAULT_DOMAIN,
+        target_language: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Main RAG query method
@@ -225,7 +254,9 @@ Answer:"""
             search_results = self.search_documents(
                 query=question,
                 n_results=n_results,
-                document_type=document_type
+                document_type=document_type,
+                domain=domain,
+                target_language=target_language
             )
             
             if not search_results:
@@ -239,8 +270,8 @@ Answer:"""
             context = self.create_context(search_results)
             
             # Step 3: Create prompt
-            system_prompt = self.create_system_prompt()
-            user_prompt = self.create_prompt_with_context(question, context)
+            system_prompt = self.create_system_prompt(domain)
+            user_prompt = self.create_prompt_with_context(question, context, domain)
             
             # Step 4: Generate answer using Ollama
             logger.info("Generating answer with Ollama...")

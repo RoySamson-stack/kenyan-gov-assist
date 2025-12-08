@@ -49,7 +49,7 @@ npm run dev
 ```
 
 ### 6. Health Checks
-- Visit `http://localhost:8000/api/health` to confirm backend.
+- Visit `http://localhost:8001/api/health` to confirm backend.
 - `GET /api/chat/stats` should return `status: "healthy"` once ingestion succeeds.
 
 ### 7. Troubleshooting

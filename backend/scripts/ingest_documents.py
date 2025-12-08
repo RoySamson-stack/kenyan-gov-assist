@@ -1,4 +1,5 @@
 
+import asyncio
 import os
 import sys
 import json
@@ -10,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.core.document_processor import DocumentProcessor, DocumentChunk
 from app.core.vector_store import VectorStore
+from app.services.translation_service import TranslationService
 from app.config import settings
 
 logging.basicConfig(
@@ -38,6 +40,11 @@ class DocumentIngestionPipeline:
             chunk_overlap=settings.CHUNK_OVERLAP
         )
         self.vector_store = VectorStore(persist_directory=self.vector_db_path)
+        self.translation_service = TranslationService()
+        self.translation_targets = [
+            lang for lang in settings.TRANSLATION_TARGET_LANGUAGES
+            if lang != settings.SOURCE_LANGUAGE
+        ]
         
         # Create directories
         os.makedirs(self.processed_docs_path, exist_ok=True)
@@ -116,6 +123,17 @@ class DocumentIngestionPipeline:
             if not chunks:
                 logger.warning(f"No chunks created from {pdf_path}")
                 return 0
+            
+            # Language and domain are already detected by DocumentProcessor
+            # Just ensure they're set (should already be there from detection)
+            for chunk in chunks:
+                if "language" not in chunk.metadata:
+                    chunk.metadata["language"] = settings.SOURCE_LANGUAGE
+                if "domain" not in chunk.metadata:
+                    chunk.metadata["domain"] = settings.DEFAULT_DOMAIN
+            
+            if self.translation_targets:
+                self._attach_translations(chunks)
             
             # Save chunks to JSON
             source_name = Path(pdf_path).stem
@@ -217,6 +235,87 @@ class DocumentIngestionPipeline:
             'total_chunks': total_chunks,
             'vector_db_count': collection_count
         }
+    
+    def _attach_translations(self, chunks: List[DocumentChunk]) -> None:
+        """
+        Translate chunk content into configured target languages and store in metadata.
+        Uses Ollama for full document translation (JSON files are only for phrase lookups).
+        """
+        if not self.translation_targets:
+            logger.info("No target languages configured, skipping translation")
+            return
+        
+        total_chunks = len(chunks)
+        total_translations = total_chunks * len(self.translation_targets)
+        logger.info(f"\n{'='*60}")
+        logger.info(f"TRANSLATING DOCUMENT CHUNKS")
+        logger.info(f"Chunks to translate: {total_chunks}")
+        logger.info(f"Target languages: {', '.join(self.translation_targets)}")
+        logger.info(f"Total translations needed: {total_translations}")
+        logger.info(f"{'='*60}\n")
+        
+        translated_count = 0
+        skipped_count = 0
+        failed_count = 0
+        
+        for idx, chunk in enumerate(chunks, 1):
+            base_text = chunk.content.strip()
+            if not base_text:
+                skipped_count += 1
+                continue
+            
+            # Detect source language from metadata or default to configured source
+            source_language = chunk.metadata.get("language", settings.SOURCE_LANGUAGE)
+            domain = chunk.metadata.get("domain", settings.DEFAULT_DOMAIN)
+            translations: Dict[str, str] = chunk.metadata.get("translations", {})
+            
+            for target_language in self.translation_targets:
+                # Skip if same language or already translated
+                if target_language == source_language:
+                    skipped_count += 1
+                    continue
+                if target_language in translations:
+                    skipped_count += 1
+                    continue
+                
+                try:
+                    # Show progress
+                    progress = ((idx - 1) * len(self.translation_targets) + 
+                               list(self.translation_targets).index(target_language) + 1)
+                    logger.info(
+                        f"[{progress}/{total_translations}] Translating chunk {idx}/{total_chunks} "
+                        f"({source_language} → {target_language})..."
+                    )
+                    
+                    # Translate using Ollama (falls back from JSON memory if phrase exists)
+                    translated = asyncio.run(
+                        self.translation_service.translate_text(
+                            text=base_text,
+                            source_language=source_language,
+                            target_language=target_language,
+                            domain=domain
+                        )
+                    )
+                    translations[target_language] = translated
+                    translated_count += 1
+                    
+                except Exception as exc:
+                    logger.error(
+                        f"✗ Failed translating chunk {idx} ({source_language}→{target_language}): {exc}",
+                        exc_info=False
+                    )
+                    failed_count += 1
+            
+            # Store translations in metadata
+            if translations:
+                chunk.metadata["translations"] = translations
+        
+        logger.info(f"\n{'='*60}")
+        logger.info(f"TRANSLATION SUMMARY")
+        logger.info(f"✓ Successfully translated: {translated_count}")
+        logger.info(f"⊘ Skipped (already translated/same language): {skipped_count}")
+        logger.info(f"✗ Failed: {failed_count}")
+        logger.info(f"{'='*60}\n")
     
     def test_search(self, query: str, n_results: int = 3):
         """

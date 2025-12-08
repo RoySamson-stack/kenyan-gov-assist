@@ -262,6 +262,8 @@ class DocumentProcessor:
                 'page_number': page_data['page_number'],
                 'total_pages': page_data['total_pages'],
                 'document_type': self._detect_document_type(page_data['source']),
+                'domain': self._detect_domain(page_data['source']),
+                'language': self._detect_language(page_data['source'], page_data['text']),
                 'processed_at': datetime.now().isoformat()
             }
             
@@ -301,6 +303,42 @@ class DocumentProcessor:
             return 'citizenship'
         else:
             return 'general'
+
+    def _detect_domain(self, filename: str) -> str:
+        """
+        Decide whether a document belongs to the civic or health domain.
+        """
+        filename_lower = filename.lower()
+        health_markers = ("health", "clinic", "hospital", "afya", "medical", "pharma")
+        if any(marker in filename_lower for marker in health_markers):
+            return "health"
+        return "civic"
+    
+    def _detect_language(self, filename: str, text: str = "") -> str:
+        """
+        Detect the source language of a document from filename and content.
+        Returns: 'english', 'swahili', or defaults to configured SOURCE_LANGUAGE
+        """
+        filename_lower = filename.lower()
+        text_lower = text.lower()[:500] if text else ""  # Sample first 500 chars
+        
+        # Check filename for language indicators
+        swahili_filename_markers = ("swahili", "kiswahili", "sw", "swa")
+        if any(marker in filename_lower for marker in swahili_filename_markers):
+            return "swahili"
+        
+        # Check content for common Swahili words
+        swahili_words = ["na", "ya", "wa", "kwa", "ni", "katika", "hii", "hili", "haya", 
+                        "serikali", "watu", "huduma", "afya", "kutoka", "kwa", "kuhusu"]
+        swahili_word_count = sum(1 for word in swahili_words if word in text_lower)
+        
+        # If we find multiple Swahili words, likely Swahili document
+        if swahili_word_count >= 3:
+            return "swahili"
+        
+        # Default to configured source language (usually English)
+        from app.config import settings
+        return settings.SOURCE_LANGUAGE
     
     def process_directory(self, directory_path: str) -> List[DocumentChunk]:
         """
