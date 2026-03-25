@@ -67,4 +67,3 @@ Active development. The core RAG pipeline works. AfyaTranslate is partially buil
 
 ## Contributing
 
-If you want to help, focus on real Kenyan use cases, keep data private (KDPA compliance), and make sure things work on low-end hardware. See `docs/AFYATRANSLATE_PLAN.md` for the healthcare extension roadmap.
