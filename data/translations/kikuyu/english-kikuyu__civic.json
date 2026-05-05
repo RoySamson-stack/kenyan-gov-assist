@@ -1,8 +1,24 @@
 {
-  "Good morning": "Uhoro wa ruciine",
-  "National ID": "Kadhi ya ithandũkũ",
-  "County office": "Ofisi ya kauti",
-  "Permit application": "Kũhoya ruhũgo",
-  "Please sign here": "Heriya andika aha"
+    "The Constitution of Kenya": "Mwathani wa Kenya",
+    "Every person has the right": "Mũndũ wothe ũrĩ na thĩna",
+    "to access government services": "kũnyita ũtumiki wa mũrũmĩ",
+    "birth certificate": "gikundo kĩa gĩthomo kĩa mathĩ",
+    "identity card": "karata ya kĩmenyithia",
+    "business registration": "kwīkia rũrĩrĩ rwa bũsinesi",
+    "land title": "mboko ya thĩ",
+    "tax payment": "kuhira ushuru",
+    "county government": "mũrũmĩ wa gatagatĩ",
+    "parliament": "bũra ya kenya",
+    "president": "mũthamaki",
+    "governor": "gavana",
+    "member of parliament": "mũtongoria wa bũra",
+    "senator": "seneta",
+    "county assembly": "bũra ya gatagatĩ",
+    "court of law": "kooti",
+    "high court": "kooti nene",
+    "supreme court": "kooti ya ngoro",
+    "police station": "esitesioni ya polisi",
+    "chief": "mũthuuri",
+    "assistant chief": "mũthuuri mũratũ",
+    "village elder": "mũkũrũ wa boma"
 }
-

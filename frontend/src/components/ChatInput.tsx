@@ -1,10 +1,13 @@
 import type { FC, KeyboardEvent } from "react";
 import { Send, Sparkles } from "lucide-react";
+import { VoiceRecorder } from "./VoiceRecorder";
 
 interface ChatInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
+  onVoiceTranscript: (text: string) => void;
+  language: string;
   disabled?: boolean;
   placeholder?: string;
 }
@@ -13,6 +16,8 @@ export const ChatInput: FC<ChatInputProps> = ({
   value,
   onChange,
   onSubmit,
+  onVoiceTranscript,
+  language,
   disabled,
   placeholder = "Ask a question...",
 }) => {
@@ -48,6 +53,11 @@ export const ChatInput: FC<ChatInputProps> = ({
           target.style.height = "auto";
           target.style.height = `${target.scrollHeight}px`;
         }}
+      />
+      <VoiceRecorder 
+        onTranscript={onVoiceTranscript} 
+        language={language}
+        disabled={disabled}
       />
       <button
         type="button"
