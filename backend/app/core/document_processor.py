@@ -8,7 +8,14 @@ import re
 import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-import PyPDF2
+try:
+    import pypdf2 as PyPDF2
+except ImportError:
+    try:
+        import PyPDF2
+    except ImportError:
+        PyPDF2 = None
+        logging.getLogger(__name__).warning("PyPDF2 not installed")
 from datetime import datetime
 
 logger = logging.getLogger(__name__)

@@ -2,7 +2,7 @@ import ollama
 from app.config import settings
 
 GPU_MODELS = {
-    "llama3.2:1b": "llama3.2:3b",
+    "llama3.2:1b": "llama3.2:1b",
     "llama3.2:3b": "llama3.2:3b",
     "llama3.1:8b": "llama3.1:8b",
 }

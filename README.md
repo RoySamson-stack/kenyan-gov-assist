@@ -1,69 +1,138 @@
-# Serikali Yangu
+# Kenyan Gov Assist - Serikali Yangu
 
-A chat assistant that helps Kenyans find answers about government services, laws, and policies. Drop a PDF in, ask a question, get an answer with source citations.
+> AI-powered assistant for Kenyan government services, healthcare, and civic information with **realtime voice translation** for Kenyan languages.
 
-Built with FastAPI, Ollama for local language models, ChromaDB for semantic search, and a React frontend.
+![CI/CD](https://github.com/RoySamson-stack/kenyan-gov-assist/actions/workflows/ci-cd.yml/badge.svg)
+![Docker Build](https://github.com/RoySamson-stack/kenyan-gov-assist/actions/workflows/ci-cd.yml/badge.svg)
+![Coverage](https://codecov.io/gh/RoySamson-stack/kenyan-gov-assist/branch/main/graph/badge.svg)
 
-## What's in here
+## Features
 
-```
-backend/        FastAPI app, RAG pipeline, translation services
-frontend/       Vite + React chat UI
-mobile/         React Native scaffold (not wired up yet)
-data/           PDFs go here, along with the vector database
-docs/           Architecture notes, API docs, setup guide
-deployment/     Docker, Kubernetes, nginx configs
-```
+- **Multi-Language Support**: English, Kiswahili, Gĩkũyũ, Dholuo, Kikamba, Kalenjin, Luhya, Somali, Kisii, Meru
+- **Realtime Voice Translation**: WebSocket + REST endpoints for voice-to-voice translation
+- **Speech-to-Text**: Whisper integration for voice input
+- **Text-to-Speech**: Coqui TTS + pyttsx3 for voice output
+- **Document Processing**: PDF, Word, Excel, ePub, HTML support
+- **Custom Kenyan Models**: `kenyan-gov:latest` (1B params), `kenyan-assitant`, `kenyan-deepseek` (1.5B)
+- **RAG Pipeline**: Retrieval-Augmented Generation using ChromaDB
+- **Translation Memory**: Phrase-level caching for common terms
+- **Production Ready**: Docker, CI/CD, Rate Limiting, Auth (coming soon)
 
 ## Quick Start
 
-1. Read `docs/SETUP.md` for the full setup guide.
-2. Drop some Kenyan government PDFs into `data/raw/`.
-3. Ingest them:
-   ```bash
-   cd backend
-   python scripts/ingest_documents.py --reset --directory ../data/raw
-   ```
-4. Pull an Ollama model (works on CPU):
-   ```bash
-   ollama pull llama3.2:1b
-   ```
-5. Run backend and frontend:
-   ```bash
-   # terminal 1
-   cd backend && uvicorn app.main:app --reload --port 8001
+### Prerequisites
+- Docker & Docker Compose (recommended)
+- OR: Python 3.12+, Node.js 20+, Ollama
 
-   # terminal 2
-   cd frontend && npm run dev
-   ```
-6. Open `http://localhost:5173` and start asking questions.
+### Option 1: Docker (Recommended)
+```bash
+git clone https://github.com/RoySamson-stack/kenyan-gov-assist.git
+cd kenyan-gov-assist
 
-## Two Modes
+# Create Kenyan language models
+bash scripts/create_kenyan_model.sh
 
-- **Serikali Yangu** – general civic questions (business registration, land titles, taxes, constitution)
-- **AfyaTranslate** – healthcare translation for clinician-patient conversations (English ↔ Swahili with medical terms)
+# Start all services
+docker-compose up -d
 
-Toggle between them in the top bar of the UI.
+# Access the app
+open http://localhost:3000
+```
 
-## Config
+### Option 2: Manual Setup
+```bash
+# 1. Install dependencies
+bash install_dependencies.sh
 
-Set these in `.env` if needed:
+# 2. Create Kenyan language models
+bash scripts/create_kenyan_model.sh
 
-| Variable | Default | Notes |
-|----------|---------|-------|
-| `OLLAMA_MODEL` | `llama3.2:1b` | CPU-friendly. Use larger models if you have GPU. |
-| `OLLAMA_BASE_URL` | `http://localhost:11434` | |
-| `OLLAMA_GPU_LAYERS` | `0` | Set higher on GPU servers |
+# 3. Start Ollama
+ollama serve
+
+# 4. Start backend (new terminal)
+cd backend
+python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
+# 5. Start frontend (new terminal)
+cd frontend
+npm install && npm run dev
+
+# 6. Open browser
+open http://localhost:5173
+```
 
 ## Testing
 
 ```bash
-cd backend && python -m pytest
+# Backend tests
+cd backend
+pytest tests/ -v --cov=app
+
+# Frontend tests
+cd frontend
+npm test
 ```
 
-## Status
+## Model Information
 
-Active development. The core RAG pipeline works. AfyaTranslate is partially built out with translation memory and telecom hooks (Africa's Talking, Twilio) but not fully integrated.
+| Model | Parameters | Size | Use Case |
+|-------|-------------|------|----------|
+| `kenyan-gov:latest` | 1B | 1.3GB | **Ready now** - General use |
+| `kenyan-assitant` | 1B | 1.3GB | Better few-shot examples |
+| `kenyan-deepseek` | 1.5B | 1.8GB | Reasoning tasks |
+| `llama3.2:1b` | 1B | 1.3GB | Fallback option |
+
+**Create custom models:**
+```bash
+bash scripts/create_kenyan_model.sh          # Llama-based
+bash scripts/create_all_models.sh          # All models
+```
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|-----------|--------|-------------|
+| `/api/health` | GET | Health check |
+| `/api/chat` | POST | Chat with AI |
+| `/api/translate` | POST | Text translation |
+| `/api/voice/transcribe` | POST | Speech-to-text |
+| `/api/voice/synthesize` | POST | Text-to-speech |
+| `/api/ws/translate` | WebSocket | Realtime voice translation |
+| `/api/documents/upload` | POST | Upload documents |
+
+## Project Structure
+
+```
+kenyan-gov-assist/
+├── backend/          # FastAPI backend
+├── frontend/         # React + Vite frontend
+├── models/          # Ollama Modelfiles
+├── scripts/         # Training & setup scripts
+├── data/            # Translation memories (hidden)
+└── deployment/      # Docker & K8s configs
+```
 
 ## Contributing
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT License - see LICENSE file.
+
+## Roadmap
+
+- [x] Basic chat + translation
+- [x] Voice input/output
+- [x] 10 Kenyan languages
+- [ ] Authentication & rate limiting
+- [ ] 80%+ test coverage
+- [ ] QLoRA fine-tuning (1000+ examples)
+- [ ] 60+ Kenyan languages
+- [ ] Mobile app (React Native)
+- [ ] PWA support

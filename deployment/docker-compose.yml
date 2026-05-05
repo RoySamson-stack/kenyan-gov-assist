@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Ollama service for LLM
+  ollama:
+    image: ollama/ollama:latest
+    container_name: kenyan-gov-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - kenyan-gov-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      sh -c "ollama serve &
+      sleep 5 &&
+      ollama pull kenyan-gov:latest &&
+      wait"
+
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kenyan-gov-backend
+    ports:
+      - "8001:8001"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=kenyan-gov:latest
+      - APP_NAME=Serikali Yangu - Kenyan Language AI
+      - CORS_ORIGINS=http://frontend:3000,http://localhost:3000
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - kenyan-gov-network
+    restart: unless-stopped
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kenyan-gov-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8001
+    depends_on:
+      - backend
+    networks:
+      - kenyan-gov-network
+    restart: unless-stopped
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:alpine
+    container_name: kenyan-gov-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - kenyan-gov-network
+    restart: unless-stopped
+
+networks:
+  kenyan-gov-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
+  redis_data:

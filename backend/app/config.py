@@ -3,10 +3,10 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Serikali Yangu - Kenyan Language AI Assistant"
+    APP_NAME: str = "Serikali Yangu - Kenyan Language AI"
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     # Default to a CPU-friendly model so deployments don't need a GPU
-    OLLAMA_MODEL: str = "kenyan-assistant"  # Custom model for Kenyan languages
+    OLLAMA_MODEL: str = "kenyan-assistant"
     # Other options: "kenyan-deepseek" (DeepSeek-based), "llama3.2:1b" (default)
     DEFAULT_DOMAIN: str = "civic"
     SUPPORTED_DOMAINS: List[str] = ["civic", "health", "general"]
@@ -45,8 +45,10 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE_MB: int = 50
     ALLOWED_EXTENSIONS: List[str] = [".pdf", ".docx", ".xlsx", ".csv", ".txt", ".md", ".epub", ".html"]
     
-    class Config:
-        env_file = ".env"
+    model_config = {
+        "env_file": ".env",
+        "extra": "ignore"
+    }
 
 
 settings = Settings()
