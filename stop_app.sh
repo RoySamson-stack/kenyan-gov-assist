@@ -6,7 +6,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}Stopping Serikali Yangu + AfyaTranslate Application${NC}\n"
+echo -e "${YELLOW}Stopping Universal Translation Assistant${NC}\n"
 
 # Stop Backend
 if [ -f "backend.pid" ]; then

@@ -6,10 +6,10 @@ interface EmptyStateProps {
 }
 
 const suggestions = [
-  "What are my rights as a Kenyan citizen?",
-  "How do I apply for a business permit?",
-  "What documents do I need for a passport?",
-  "How can I access healthcare services?",
+  "Translate this paragraph into Kiswahili",
+  "Summarize this document in simple language",
+  "Help me translate a formal letter",
+  "Rewrite this text for a different audience",
 ];
 
 export const EmptyState: FC<EmptyStateProps> = ({ onSelect }) => {
@@ -22,7 +22,7 @@ export const EmptyState: FC<EmptyStateProps> = ({ onSelect }) => {
         How can I help you today?
       </h2>
       <p className="mb-8 text-white/60">
-        Ask me anything about Kenyan government services or healthcare
+        Ask for translation, rewriting, summaries, or language help
       </p>
       <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
         {suggestions.map((suggestion, idx) => (

@@ -3,13 +3,13 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Serikali Yangu - Kenyan Language AI"
+    APP_NAME: str = "Universal Translation Assistant"
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     # Default to a CPU-friendly model so deployments don't need a GPU
     OLLAMA_MODEL: str = "kenyan-assistant"
     # Other options: "kenyan-deepseek" (DeepSeek-based), "llama3.2:1b" (default)
-    DEFAULT_DOMAIN: str = "civic"
-    SUPPORTED_DOMAINS: List[str] = ["civic", "health", "general"]
+    DEFAULT_DOMAIN: str = "general"
+    SUPPORTED_DOMAINS: List[str] = ["general", "education", "business", "personal"]
     
     # Kenyan languages supported
     SOURCE_LANGUAGE: str = "english"

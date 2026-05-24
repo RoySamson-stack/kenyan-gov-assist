@@ -2,7 +2,7 @@
 
 ## Models Available (Ready to Use)
 
-### 1. **kenyan-gov:latest** ✅ Installed
+### 1. **kenyan-assistant** ✅ Installed
 - **Base:** Llama 3.2 1B
 - **Parameters:** ~1 billion
 - **Size:** 1.3 GB
@@ -52,7 +52,7 @@
 |----------|---------|----------|
 | Translation memories | 83 | Good |
 | Generated phrases | 54 pairs | Basic |
-| Civic QA pairs | 6 | Basic |
+| General QA pairs | 6 | Basic |
 | **Total** | **328** | **Too few for QLoRA** |
 
 **Collect more data, then run:**
@@ -90,7 +90,7 @@ kenyan-gov-assist/
 
 ```bash
 # 1. Test existing model
-ollama run kenyan-gov:latest "Habari? Nawezaje kukusaidia?"
+ollama run kenyan-assistant "Habari? Nawezaje kukusaidia?"
 
 # 2. Create better model (Modelfile-based)
 bash scripts/create_kenyan_model.sh
@@ -101,4 +101,4 @@ cd backend && python3 -m uvicorn app.main:app  # Terminal 2
 cd frontend && npm run dev  # Terminal 3
 ```
 
-**Your `kenyan-gov:latest` works NOW** - start using it while collecting more data for QLoRA training! 🚀
+**Your `kenyan-assistant` works NOW** - start using it while collecting more data for QLoRA training! 🚀

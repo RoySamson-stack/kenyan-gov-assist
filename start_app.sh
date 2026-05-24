@@ -6,7 +6,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}Starting Serikali Yangu + AfyaTranslate Application${NC}\n"
+echo -e "${GREEN}Starting Universal Translation Assistant${NC}\n"
 
 # Check if Ollama is running
 echo -e "${YELLOW}Checking Ollama...${NC}"

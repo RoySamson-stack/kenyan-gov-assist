@@ -12,6 +12,8 @@ data/vector_db/
 data/finetune/
 data/.finetune_backup/
 data/translations/
+curriculum_translation_backend/storage/
+curriculum_translation_backend/.env
 
 # ===========================================
 # HIDE MODELS (Can be recreated with scripts)

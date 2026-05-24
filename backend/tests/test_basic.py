@@ -22,12 +22,12 @@ from app.config import settings
 client = TestClient(app)
 
 
-class TestHealthEndpoint:
-    """Test health check endpoint."""
+class TestGeneralEndpoint:
+    """Test general check endpoint."""
     
-    def test_health_endpoint(self):
-        """Test that health endpoint returns OK."""
-        response = client.get("/api/health")
+    def test_general_endpoint(self):
+        """Test that general endpoint returns OK."""
+        response = client.get("/api/general")
         assert response.status_code == 200
     
     def test_root_endpoint(self):
@@ -63,7 +63,7 @@ class TestTranslationEndpoint:
                 "text": "Hello, how are you?",
                 "source_language": "english",
                 "target_language": "swahili",
-                "domain": "civic",
+                "domain": "general",
             }
         )
         # Should return success or error (if Ollama not running)

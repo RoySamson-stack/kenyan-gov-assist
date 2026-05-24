@@ -1,5 +1,5 @@
 """
-RAG Service for Serikali Yangu
+RAG Service for Universal Translator
 Retrieves relevant documents and generates contextual answers
 """
 
@@ -96,7 +96,7 @@ class RAGService:
             Formatted context string
         """
         if not search_results:
-            return "No relevant information found in government documents."
+            return "No relevant information found in uploaded documents."
         
         context_parts = []
         
@@ -113,44 +113,23 @@ class RAGService:
         return context
     
     def create_system_prompt(self, domain: str = settings.DEFAULT_DOMAIN) -> str:
-        """Return a domain-aware system prompt."""
-        civic_prompt = """You are Serikali Yangu, an AI assistant for Kenyan government information.
+        """Return a general document-assistant system prompt."""
+        return """You are Universal Translator, an AI assistant for translation and document understanding.
 
 Your role:
-- Answer questions about Kenyan laws, policies, and government services.
-- Provide accurate information based on official government documents.
-- Always cite your sources when providing information.
-- Be helpful, clear, and respectful.
-- Use simple language that citizens can understand.
+- Answer questions using the uploaded documents and translation context.
+- Help users translate, summarize, rewrite, and understand text.
+- Preserve meaning, names, numbers, and important terminology.
+- Use clear language suitable for the user's requested audience.
+- Cite sources when document context is provided.
 
 Important rules:
-1. ONLY use information from the provided documents.
-2. ALWAYS cite which document and page your answer comes from.
-3. If the documents don't contain the answer, say so clearly.
-4. Never make up information.
-5. If a question is unclear, ask for clarification.
-
-Format your answers like this:
-- Start with a direct answer.
-- Provide relevant details.
-- End with source citations in brackets like [Source: constitution.pdf, Page 5].
+1. Use the provided context when answering document-specific questions.
+2. If the context does not contain the answer, say so clearly.
+3. Do not invent facts or citations.
+4. Ask for clarification when the request is unclear.
 """
-        health_prompt = """You are AfyaTranslate, a Kenyan healthcare language assistant.
 
-Your role:
-- Support clinicians and patients by translating and explaining medical information accurately.
-- Use compassionate language and prioritize patient safety.
-- Reference Kenyan Ministry of Health guidance and provided medical documents.
-- Highlight critical instructions (dosage, follow-up) clearly.
-
-Important rules:
-1. Stick to the provided medical context; avoid speculation.
-2. Flag emergencies if symptoms sound life threatening and recommend immediate care.
-3. Use simple, culturally sensitive explanations.
-4. Cite the source document or phrase pack when possible.
-"""
-        return health_prompt if domain == "health" else civic_prompt
-    
     def create_prompt_with_context(
         self,
         query: str,
@@ -167,8 +146,8 @@ Important rules:
         Returns:
             Formatted prompt
         """
-        domain_label = "healthcare guidance" if domain == "health" else "government documents"
-        prompt = f"""Context from Kenyan {domain_label}:
+        domain_label = "uploaded documents"
+        prompt = f"""Context from {domain_label}:
 
 {context}
 
@@ -180,7 +159,7 @@ Based ONLY on the documents provided above, please answer the user's question.
 Remember to cite your sources using the format [Source: document_name, Page X].
 
 If the documents don't contain information to answer the question, say:
-"I don't have information about that in the available government documents. Please try rephrasing your question or visit your nearest Huduma Centre for assistance."
+"I don't have information about that in the available uploaded documents. Please try rephrasing your question or visit your nearest support team for assistance."
 
 Answer:"""
         
@@ -243,7 +222,7 @@ Answer:"""
                 return {
                     "answer": (
                         "Document knowledge base is empty. Please run the ingestion pipeline "
-                        "to load Kenyan government documents before chatting."
+                        "to load translation documents before chatting."
                     ),
                     "sources": [],
                     "status": "vector_store_not_ready",
@@ -261,7 +240,7 @@ Answer:"""
             
             if not search_results:
                 return {
-                    "answer": "I couldn't find relevant information in the government documents. Please try rephrasing your question or contact your nearest Huduma Centre for assistance.",
+                    "answer": "I couldn't find relevant information in the uploaded documents. Please try rephrasing your question or contact your nearest support team for assistance.",
                     "sources": [],
                     "status": "no_results"
                 }
@@ -307,7 +286,7 @@ Answer:"""
             count = self.vector_store.get_collection_count()
             return {
                 "total_chunks": count,
-                "status": "healthy" if count > 0 else "empty"
+                "status": "generaly" if count > 0 else "empty"
             }
         except Exception as e:
             logger.error(f"Error getting collection stats: {e}")

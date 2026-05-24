@@ -7,7 +7,7 @@
 - **Parameters:** ~1 billion
 - **Size:** ~1.3GB
 - **Speed:** Fast (CPU-compatible)
-- **Best for:** General Kenyan language translation, civic info, health
+- **Best for:** General Kenyan language translation, translation support, general
 
 ### 2. **kenyan-deepseek**
 - **Base:** DeepSeek-R1 1.5B

@@ -10,7 +10,7 @@
 
 ### 2. ✅ **Basic Tests Written** (6 Tests Passing!)
 - Created `backend/tests/test_basic.py`
-- Health endpoint tests
+- General endpoint tests
 - Root endpoint tests
 - Translation endpoint tests
 - Config tests
@@ -39,7 +39,7 @@
 ### 6. ✅ **Docker Compose Created**
 - `docker-compose.yml` - Full stack
 - Ollama + Backend + Frontend + Redis
-- Health checks
+- General checks
 - Volume persistence
 
 ### 7. ✅ **Rate Limiting Added**
@@ -53,9 +53,9 @@
 ## 📊 **This Month (Quality) - IN PROGRESS**
 
 ### 1. [ ] **Collect 1000+ Training Examples** (Currently: 328)
-- [ ] Scrape Kenyan government websites
+- [ ] Scrape translation websites
 - [ ] Translate common phrases (Kikuyu, Luo, etc.)
-- [ ] Add civic + health QA pairs
+- [ ] Add translation QA pairs
 - [ ] Include constitutional excerpts
 
 ### 2. [ ] **QLoRA Fine-tuning**
@@ -129,8 +129,8 @@ docker-compose up -d
 
 ### **Test the API:**
 ```bash
-# Health check
-curl http://localhost:8001/api/health
+# General check
+curl http://localhost:8001/api/general
 
 # Test translation
 curl -X POST http://localhost:8001/api/translate \

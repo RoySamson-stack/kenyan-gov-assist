@@ -163,13 +163,13 @@ class TelecomGateway:
         domain_key = domain if domain in settings.SUPPORTED_DOMAINS else settings.DEFAULT_DOMAIN
 
         if not text or text.strip() == "":
-            menu = "CON AfyaTranslate\n1. Triage\n2. Prescription tips\n3. Government FAQs"
+            menu = "CON Voice Translation\n1. Triage\n2. Prescription tips\n3. Translation FAQs"
         elif text.endswith("1"):
             menu = "END Please describe the symptoms to the nurse at the clinic."
         elif text.endswith("2"):
             menu = "END Take medicines exactly as prescribed. Visit the clinic if symptoms persist."
         else:
-            menu = "END For government services, dial *123*2#. Stay healthy!"
+            menu = "END For translation services, dial *123*2#. Stay generaly!"
 
         logger.info("USSD session %s via %s responded (domain=%s)", session_id, provider, domain_key)
         return {

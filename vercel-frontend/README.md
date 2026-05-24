@@ -1,15 +1,15 @@
-# Serikali Yangu — Vercel Frontend
+# Universal Translator — Vercel Frontend
 
-Next.js frontend for the Serikali Yangu Kenyan Government Assistant.
+Next.js frontend for the Universal Translator Translation Assistant.
 
 ## Design
 
 Features a Kenyan-themed UI with:
 - Forest green and earth tone color palette
-- Serikali Yangu (civic) and AfyaTranslate (healthcare) modes
+- Universal Translator (general) and Voice Translation (voice translation) modes
 - Sidebar with quick topics, PDF upload zone, and chat history
 - Real-time chat with typing indicators
-- Translation panel for AfyaTranslate mode
+- Translation panel for Voice Translation mode
 - Kenya flag stripe accent
 
 ## Deploy to Vercel

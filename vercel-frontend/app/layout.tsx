@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Serikali Yangu — Kenya Government Assistant",
-  description: "Ask about Kenyan government services, laws, and policies",
+  title: "Universal Translator",
+  description: "Ask about translation services, laws, and policies",
 };
 
 export default function RootLayout({

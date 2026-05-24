@@ -36,7 +36,7 @@ const topics: Record<string, Topic[]> = {
     { icon: "💊", label: "Medication Terms" },
     { icon: "🩺", label: "Diagnosis Translation" },
     { icon: "🏥", label: "Hospital Procedures" },
-    { icon: "🤱", label: "Maternal Health" },
+    { icon: "🤱", label: "Maternal General" },
     { icon: "🧪", label: "Lab Results" },
     { icon: "📋", label: "Consent Forms" },
   ],
@@ -60,17 +60,17 @@ const suggestions: Record<string, Suggestion[]> = {
 const modeConfig = {
   serikali: {
     icon: "🏛️",
-    title: "Serikali Yangu — Civic Assistant",
-    subtitle: "Business registration · Land titles · Tax · Constitution · Government services",
+    title: "Universal Translator — General Assistant",
+    subtitle: "Business registration · Land titles · Tax · Constitution · Translation services",
     badge: "📚 RAG · Local Model",
     welcomeEmoji: "🏛️",
     welcomeTitle: "Habari! How can I help you today?",
-    welcomeSub: "Ask me anything about Kenyan government services, laws, and policies. You can also drop a PDF for document-specific answers.",
-    placeholder: "Ask about government services, laws, policies…",
+    welcomeSub: "Ask me anything about translation services, laws, and policies. You can also drop a PDF for document-specific answers.",
+    placeholder: "Ask about translation services, laws, policies…",
   },
   afya: {
     icon: "🏥",
-    title: "AfyaTranslate — Healthcare Translation",
+    title: "Voice Translation — Voice Translation Translation",
     subtitle: "English ↔ Kiswahili · Medical terminology · Clinician-patient communication",
     badge: "🔄 Translation Memory",
     welcomeEmoji: "🏥",
@@ -84,7 +84,7 @@ const historyItems = [
   { title: "How do I register a business in Kenya?", date: "Today, 10:32 AM" },
   { title: "Land title transfer requirements", date: "Yesterday" },
   { title: "KRA PIN registration process", date: "Mon, Mar 16" },
-  { title: "AfyaTranslate: Diabetes patient", date: "Sun, Mar 15" },
+  { title: "Voice Translation: Diabetes patient", date: "Sun, Mar 15" },
   { title: "Constitutional rights — Article 43", date: "Fri, Mar 13" },
 ];
 
@@ -154,7 +154,7 @@ export default function Home() {
           message: text,
           language: lang === "en" ? "english" : "swahili",
           use_rag: true,
-          domain: mode === "afya" ? "health" : "civic",
+          domain: mode === "afya" ? "general" : "general",
         }),
       });
 
@@ -232,7 +232,7 @@ export default function Home() {
             </svg>
           </div>
           <div className="brand-text">
-            <div className="brand-name">Serikali Yangu</div>
+            <div className="brand-name">Universal Translator</div>
             <div className="brand-sub">Kenya Gov Assistant</div>
           </div>
         </div>
@@ -242,13 +242,13 @@ export default function Home() {
             className={`mode-btn ${mode === "serikali" ? "active" : ""}`}
             onClick={() => setMode("serikali")}
           >
-            🏛️ Serikali Yangu
+            🏛️ Universal Translator
           </button>
           <button
             className={`mode-btn ${mode === "afya" ? "active" : ""}`}
             onClick={() => setMode("afya")}
           >
-            🏥 AfyaTranslate
+            🏥 Voice Translation
           </button>
         </div>
 
@@ -306,7 +306,7 @@ export default function Home() {
             <div className="upload-zone" onClick={simulateUpload}>
               <div className="upload-icon">📄</div>
               <div className="upload-text">
-                <strong>Drop a Government PDF</strong>
+                <strong>Drop a PDF</strong>
                 <br />
                 Laws, policies, circulars, forms
               </div>

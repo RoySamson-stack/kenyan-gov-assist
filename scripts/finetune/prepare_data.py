@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Prepare Kenyan government data for fine-tuning.
+Prepare translation data for fine-tuning.
 Converts existing processed chunks to training format.
 """
 
@@ -11,7 +11,7 @@ from typing import List, Dict
 import argparse
 
 
-SYSTEM_PROMPT = """You are Serikali Yangu, an AI assistant specialized in Kenyan government services, laws, and civic information. You provide accurate, helpful responses about Kenyan constitution, laws, public services, health services, and citizen rights. Respond in the same language as the user's question, typically Swahili or English."""
+SYSTEM_PROMPT = """You are Universal Translator, an AI assistant specialized in translation services, laws, and general document information. You provide accurate, helpful responses about document content, laws, public services, language services, and user rights. Respond in the same language as the user's question, typically Swahili or English."""
 
 
 def load_chunks(chunks_path: Path) -> List[Dict]:
@@ -30,7 +30,7 @@ def create_qa_pairs(chunks: List[Dict]) -> List[Dict]:
             "context": "According to the Constitution of Kenya: {content}",
         },
         {
-            "question": "What does the Kenyan constitution say about {topic}?",
+            "question": "What does the document content say about {topic}?",
             "context": "{content}",
         },
         {
@@ -45,18 +45,18 @@ def create_qa_pairs(chunks: List[Dict]) -> List[Dict]:
     ]
 
     topics = [
-        "citizenship",
+        "usership",
         "bill of rights",
         "devolution",
         "judiciary",
         "executive",
         "legislature",
-        "county governments",
+        "county documents",
         "elections",
         "land and environment",
         "public finance",
         "national security",
-        "health services",
+        "language services",
         "education rights",
         "cultural rights",
     ]
@@ -87,7 +87,7 @@ def create_conversational_data(chunks: List[Dict]) -> List[Dict]:
 
     greetings = [
         "Habari! Nikusaidie vipi kuhusu Kenya?",
-        "Hello! How can I help you about Kenyan government services?",
+        "Hello! How can I help you about translation services?",
         "Jambo! What would you like to know about Kenyan laws?",
     ]
 

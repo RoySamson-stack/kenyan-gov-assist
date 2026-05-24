@@ -13,25 +13,25 @@ from typing import List, Dict
 KENYAN_PHRASES = {
     "swahili": {
         "greetings": ["Habari?", "Hujambo?", "Shikamoo", "Mambo vipi?"],
-        "government": ["Serikali ya Kenya", "Katiba ya Kenya", "Huduma za umma", "Sera za serikali"],
-        "health": ["Hospitali", "Daktari", "Dawa", "Afya ni lazima"],
+        "documents": ["Kitabu cha masomo", "Mwongozo wa mtumiaji", "Nakala ya mafunzo", "Barua rasmi"],
+        "general": ["Shule", "Mwalimu", "Kitabu", "Tafsiri ni muhimu"],
         "rights": ["Haki za binadamu", "Haki za kiraia", "Haki ya kupata habari"],
     },
     "kikuyu": {
         "greetings": ["Ũhoro?", "Wĩ mwega?", "Mwega mũno?"],
-        "government": ["Mũrũmĩ wa Kenya", "Mwathani wa Kenya", "Huduma cia ũmwe"],
-        "health": ["Hosipitari", "Mũgĩ", "Mũti", "Afya nĩ ya ngiri"],
+        "documents": ["Mũrũmĩ wa Kenya", "Mwathani wa Kenya", "Service cia ũmwe"],
+        "general": ["Cukuru", "Mwalimu", "Ibuku", "Tafsiri nĩ njega"],
         "rights": ["Thĩna cia mũndũ", "Haki cia thĩ"],
     },
     "luo": {
         "greetings": ["Misawa?", "Idhi nade?", "Ber nade?"],
-        "government": ["Kulo mar Kenya", "Kanungo mar Kenya", "Tugo mag kulo"],
-        "health": ["Hospital", "Daktar", "Dawa", "Afya en gi ber"],
+        "documents": ["Kulo mar Kenya", "Kanungo mar Kenya", "Tugo mag kulo"],
+        "general": ["Skul", "Japuonj", "Buk", "Loko dhok ber"],
         "rights": ["Thim mag jaduong'", "Kwongo mag jaduong'"],
     }
 }
 
-SYSTEM_PROMPT = """You are Serikali Yangu AI, an assistant for Kenyan government services, healthcare, and civic information. You speak English, Swahili, Kikuyu, Luo, and other Kenyan languages fluently."""
+SYSTEM_PROMPT = """You are Universal Translator AI, an assistant for translation services, voice translation, and general document information. You speak English, Swahili, Kikuyu, Luo, and other Kenyan languages fluently."""
 
 
 def generate_translation_examples() -> List[Dict]:
@@ -41,20 +41,20 @@ def generate_translation_examples() -> List[Dict]:
     translations = [
         # Swahili translations
         {"en": "Hello, how can I help you?", "sw": "Habari, nawezaje kukusaidia?", "domain": "general"},
-        {"en": "You have the right to access government services", "sw": "Una haki ya kupata huduma za serikali", "domain": "civic"},
-        {"en": "Where is the nearest hospital?", "sw": "Hospitali ya karibu iko wapi?", "domain": "health"},
-        {"en": "I need to register my business", "sw": "Nahitaji kusajili biashara yangu", "domain": "civic"},
-        {"en": "What documents do I need for ID card?", "sw": "Nahitaji nyaraka gani za kitambulisho?", "domain": "civic"},
+        {"en": "You have the right to access translation services", "sw": "Una haki ya kupata huduma za serikali", "domain": "general"},
+        {"en": "Where is the nearest hospital?", "sw": "Hospitali ya karibu iko wapi?", "domain": "general"},
+        {"en": "I need to register my business", "sw": "Nahitaji kusajili biashara yangu", "domain": "general"},
+        {"en": "What documents do I need for ID card?", "sw": "Nahitaji nyaraka gani za kitambulisho?", "domain": "general"},
         
         # Kikuyu translations
         {"en": "Hello, how can I help you?", "ki": "Ũhoro, ndingikwathenia atĩa?", "domain": "general"},
-        {"en": "You have the right to access government services", "ki": "Ũrĩ na thĩna wa kinyita ũtumiki wa mũrũmĩ", "domain": "civic"},
-        {"en": "Where is the nearest hospital?", "ki": "Hositari ya karibu irĩ kĩa?", "domain": "health"},
+        {"en": "You have the right to access translation services", "ki": "Ũrĩ na thĩna wa kinyita ũtumiki wa mũrũmĩ", "domain": "general"},
+        {"en": "Where is the nearest hospital?", "ki": "Hositari ya karibu irĩ kĩa?", "domain": "general"},
         
         # Luo translations
         {"en": "Hello, how can I help you?", "lu": "Misawa, anapawa neno?", "domain": "general"},
-        {"en": "You have the right to access government services", "lu": "Gi thim mochuno kaw gi tugo mag kulo", "domain": "civic"},
-        {"en": "Where is the nearest hospital?", "lu": "Hospitali mamitoyiendo niyo kanye?", "domain": "health"},
+        {"en": "You have the right to access translation services", "lu": "Gi thim mochuno kaw gi tugo mag kulo", "domain": "general"},
+        {"en": "Where is the nearest hospital?", "lu": "Hospitali mamitoyiendo niyo kanye?", "domain": "general"},
     ]
     
     for trans in translations:
@@ -80,30 +80,30 @@ def generate_translation_examples() -> List[Dict]:
     return examples
 
 
-def generate_civic_qa_examples() -> List[Dict]:
-    """Generate civic question-answer examples."""
+def generate_general_qa_examples() -> List[Dict]:
+    """Generate general question-answer examples."""
     examples = []
     
     qa_pairs = [
         {
             "question": "What is the Constitution of Kenya?",
-            "answer": "The Constitution of Kenya is the supreme law of Kenya, promulgated in 2010. It establishes the framework for government, outlines citizens' rights, and provides for devolution with 47 counties."
+            "answer": "The Constitution of Kenya is the supreme law of Kenya, promulgated in 2010. It establishes the framework for document, outlines users' rights, and provides for devolution with 47 counties."
         },
         {
             "question": "How do I register a business in Kenya?",
-            "answer": "To register a business in Kenya, visit Huduma Centre or use eCitizen portal. You need: 1) Proposed business name, 2) Copy of ID, 3) Passport photo, 4) Registration fee. Registration takes 3-7 days."
+            "answer": "To register a business in Kenya, visit support team or use eCitizen portal. You need: 1) Proposed business name, 2) Copy of ID, 3) Passport photo, 4) Registration fee. Registration takes 3-7 days."
         },
         {
             "question": "What are the counties in Kenya?",
-            "answer": "Kenya has 47 counties established under the 2010 Constitution. Major counties include Nairobi, Mombasa, Kisumu, Nakuru, Kiambu, and Machakos. Each county has its own government with a Governor and County Assembly."
+            "answer": "Kenya has 47 counties established under the 2010 Constitution. Major counties include Nairobi, Mombasa, Kisumu, Nakuru, Kiambu, and Machakos. Each county has its own document with a Governor and County Assembly."
         },
         {
-            "question": "Habari za Huduma Centre?",
-            "answer": "Huduma Centre ni kituo cha kupata huduma za serikali kwa urahisi. Hapa unaweza pata huduma kama vile: usajili wa biashara, kitambulisho cha taifa, leseni ya gari, na huduma nyingine nyingi za serikali."
+            "question": "Habari za support team?",
+            "answer": "support team ni kituo cha kupata huduma za serikali kwa urahisi. Hapa unaweza pata huduma kama vile: usajili wa biashara, kitambulisho cha taifa, leseni ya gari, na huduma nyingine nyingi za serikali."
         },
         {
             "question": "Ni hatua gani za kupata ID card?",
-            "answer": "Hatua za kupata kitambulisho cha taifa Kenya: 1) Nenda Huduma Centre au ofisi ya Karagita, 2) Lipa ada ya shilingi 100, 3) Toa vyeti vya kuzaliwa na picha, 4) Subiri kwa siku 7-14, 5) Chukua ID yako."
+            "answer": "Hatua za kupata kitambulisho cha taifa Kenya: 1) Nenda support team au ofisi ya Karagita, 2) Lipa ada ya shilingi 100, 3) Toa vyeti vya kuzaliwa na picha, 4) Subiri kwa siku 7-14, 5) Chukua ID yako."
         },
     ]
     
@@ -119,14 +119,14 @@ def generate_civic_qa_examples() -> List[Dict]:
     return examples
 
 
-def generate_health_qa_examples() -> List[Dict]:
-    """Generate health-related question-answer examples."""
+def generate_general_qa_examples() -> List[Dict]:
+    """Generate general-related question-answer examples."""
     examples = []
     
     qa_pairs = [
         {
             "question": "What are the symptoms of malaria?",
-            "answer": "Malaria symptoms include: 1) High fever, 2) Chills and sweating, 3) Headache, 4) Nausea and vomiting, 5) Body aches. If you experience these symptoms, visit a health facility immediately for testing and treatment."
+            "answer": "Malaria symptoms include: 1) High fever, 2) Chills and sweating, 3) Headache, 4) Nausea and vomiting, 5) Body aches. If you experience these symptoms, visit a general facility immediately for testing and treatment."
         },
         {
             "question": "Je, dalili za malaria ni zipi?",
@@ -161,7 +161,7 @@ def generate_conversational_examples() -> List[Dict]:
         },
         {
             "user": "Ũhoro waku?",
-            "assistant": "Ndamwega mũno! Nĩngwathenia atĩa rũũci wa kwĩ? Huduma irĩa wĩhokete?"
+            "assistant": "Ndamwega mũno! Nĩngwathenia atĩa rũũci wa kwĩ? Service irĩa wĩhokete?"
         },
         {
             "user": "Misawa? Idhi nade?",
@@ -169,7 +169,7 @@ def generate_conversational_examples() -> List[Dict]:
         },
         {
             "user": "I need help with ID application",
-            "assistant": "I can help you with ID application. You need to: 1) Visit Huduma Centre, 2) Bring your birth certificate, 3) Have a passport-size photo, 4) Pay KSh 100 fee. The process takes about 2 weeks."
+            "assistant": "I can help you with ID application. You need to: 1) Visit support team, 2) Bring your birth certificate, 3) Have a passport-size photo, 4) Pay KSh 100 fee. The process takes about 2 weeks."
         },
     ]
     
@@ -196,8 +196,8 @@ def main():
     
     # Generate different types of examples
     all_examples.extend(generate_translation_examples())
-    all_examples.extend(generate_civic_qa_examples())
-    all_examples.extend(generate_health_qa_examples())
+    all_examples.extend(generate_general_qa_examples())
+    all_examples.extend(generate_general_qa_examples())
     all_examples.extend(generate_conversational_examples())
     
     print(f"Generated {len(all_examples)} training examples")

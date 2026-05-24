@@ -26,7 +26,7 @@ embedding_service = EmbeddingService()
 @router.post("/documents/upload")
 async def upload_document(
     file: UploadFile = File(...),
-    domain: str = "civic",
+    domain: str = "general",
     process_immediately: bool = True
 ):
     """
@@ -147,7 +147,7 @@ async def get_supported_formats():
 
 
 @router.post("/documents/process-directory")
-async def process_directory(path: str, domain: str = "civic"):
+async def process_directory(path: str, domain: str = "general"):
     """
     Process all supported documents in a directory.
     Admin endpoint for bulk processing.

@@ -80,7 +80,7 @@ Format for custom chunks:
     "content": "Your document content here...",
     "metadata": {
       "source": "document.pdf",
-      "domain": "civic"
+      "domain": "general"
     }
   }
 ]

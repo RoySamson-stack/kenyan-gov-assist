@@ -2,9 +2,9 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get("/health")
-def health_check():
+@router.get("/general")
+def general_check():
     return {
-        "status": "healthy",
-        "service": "Serikali Yangu API"
+        "status": "generaly",
+        "service": "Universal Translation API"
     }

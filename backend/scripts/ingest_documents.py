@@ -354,7 +354,7 @@ def main():
     """Main entry point"""
     import argparse
     
-    parser = argparse.ArgumentParser(description='Ingest Kenyan government documents')
+    parser = argparse.ArgumentParser(description='Ingest translation documents')
     parser.add_argument('--directory', type=str, help='Directory containing PDFs')
     parser.add_argument('--file', type=str, help='Single PDF file to process')
     parser.add_argument('--test-search', type=str, help='Test search with a query')

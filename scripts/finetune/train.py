@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-QLoRA Fine-tuning script for Kenyan Government Assistant.
-Trains llama3.2:1b on Kenyan constitution and government data.
+QLoRA Fine-tuning script for Translation Assistant.
+Trains llama3.2:1b on translation and document data.
 
 Requirements:
     pip install torch bitsandbytes peft transformers accelerate datasets trl scipy

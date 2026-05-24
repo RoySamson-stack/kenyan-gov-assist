@@ -1,5 +1,4 @@
 import { useCallback, useState, useRef, useEffect } from "react";
-import clsx from "clsx";
 import type { ChatMessage, MessageSource } from "../types/chat";
 import { v4 as uuid } from "uuid";
 import {
@@ -7,7 +6,6 @@ import {
   EmptyState,
   MessageList,
   TypingIndicator,
-  VoiceRecorder,
 } from "../components";
 
 const languages = [
@@ -19,31 +17,12 @@ const languages = [
   { code: "kalenjin", label: "Kalenjin" },
 ];
 
-const domainOptions = [
-  {
-    id: "civic",
-    label: "Serikali Yangu",
-    description: "Government & citizen services",
-  },
-  {
-    id: "health",
-    label: "AfyaTranslate",
-    description: "Clinician ↔ patient support",
-  },
-  {
-    id: "translation",
-    label: "Realtime Voice",
-    description: "Voice-to-voice translation",
-  },
-] as const;
-
 export const ChatPage = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState<string>("english");
   const [targetLanguage, setTargetLanguage] = useState<string>("swahili");
-  const [domain, setDomain] = useState<(typeof domainOptions)[number]["id"]>("civic");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -78,27 +57,17 @@ export const ChatPage = () => {
       setLoading(true);
 
       try {
-        const endpoint = domain === "translation" ? "translate" : "chat";
-        const body = domain === "translation" 
-          ? {
-              text: content,
-              source_language: language,
-              target_language: targetLanguage,
-              domain: "general",
-            }
-          : {
-              message: content,
-              language,
-              use_rag: true,
-              domain,
-            };
-
         const response = await fetch(`${
-          import.meta.env.VITE_API_URL || 'http://localhost:8001'
-        }/api/${endpoint}`, {
+          import.meta.env.VITE_API_URL || "http://localhost:8001"
+        }/api/translate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            text: content,
+            source_language: language,
+            target_language: targetLanguage,
+            domain: "general",
+          }),
         });
 
         if (!response.ok) {
@@ -109,9 +78,7 @@ export const ChatPage = () => {
         const assistantMessage: ChatMessage = {
           id: uuid(),
           role: "assistant",
-          content: domain === "translation" 
-            ? data.data?.translation || data.translation || "Translation failed"
-            : data.response,
+          content: data.data?.translation || data.translation || "Translation failed",
           timestamp: new Date().toISOString(),
           sources: (data.sources ?? []) as MessageSource[],
         };
@@ -134,7 +101,7 @@ export const ChatPage = () => {
         setLoading(false);
       }
     },
-    [domain, input, language, targetLanguage, loading]
+    [input, language, targetLanguage, loading]
   );
 
   const handleSubmit = () => {
@@ -146,53 +113,7 @@ export const ChatPage = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-slate-950 text-white">
-      {/* Top Header */}
-      <div className="border-b border-white/10 bg-slate-950/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-4">
-            <h1 className="text-lg font-semibold">
-              {domain === "civic" ? "Serikali Yangu" : domain === "health" ? "AfyaTranslate AI" : "Realtime Voice Translate"}
-            </h1>
-            <div className="flex gap-2">
-              {domainOptions.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setDomain(item.id)}
-                  className={clsx(
-                    "rounded-lg px-3 py-1.5 text-xs font-medium transition",
-                    domain === item.id
-                      ? "bg-white/10 text-white"
-                      : "text-white/60 hover:text-white/80"
-                  )}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            {languages.map((item) => (
-              <button
-                key={item.code}
-                type="button"
-                onClick={() => setLanguage(item.code)}
-                className={clsx(
-                  "rounded-lg px-3 py-1.5 text-xs font-medium transition",
-                  language === item.code
-                    ? "bg-white/10 text-white"
-                    : "text-white/60 hover:text-white/80"
-                )}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Chat Area */}
+    <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
       <div
         ref={chatContainerRef}
         className="flex-1 overflow-y-auto"
@@ -213,25 +134,34 @@ export const ChatPage = () => {
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="border-t border-white/10 bg-slate-950/80 backdrop-blur-sm">
+      <div className="shrink-0 border-t border-white/10 bg-slate-950/90 backdrop-blur-sm">
         <div className="mx-auto max-w-3xl px-4 py-4">
-          {domain === "translation" && (
-            <div className="mb-2 flex items-center gap-2 text-xs text-white/60">
-              <span>Translating from:</span>
-              <span className="text-white">{languages.find(l => l.code === language)?.label}</span>
-              <span>→</span>
-              <select 
-                value={targetLanguage} 
-                onChange={(e) => setTargetLanguage(e.target.value)}
-                className="bg-white/10 rounded px-2 py-1 text-white"
+          <div className="mb-3 grid gap-2 text-xs text-white/60 sm:grid-cols-2">
+            <label className="flex items-center gap-2">
+              <span className="shrink-0">From</span>
+              <select
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/10 px-2 py-1.5 text-white outline-none"
               >
-                {languages.filter(l => l.code !== language).map(l => (
-                  <option key={l.code} value={l.code}>{l.label}</option>
+                {languages.map((item) => (
+                  <option key={item.code} value={item.code}>{item.label}</option>
                 ))}
               </select>
-            </div>
-          )}
+            </label>
+            <label className="flex items-center gap-2">
+              <span className="shrink-0">To</span>
+              <select
+                value={targetLanguage}
+                onChange={(event) => setTargetLanguage(event.target.value)}
+                className="min-w-0 flex-1 rounded-md border border-white/10 bg-white/10 px-2 py-1.5 text-white outline-none"
+              >
+                {languages.filter((item) => item.code !== language).map((item) => (
+                  <option key={item.code} value={item.code}>{item.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
           <ChatInput
             value={input}
             onChange={setInput}
@@ -239,16 +169,10 @@ export const ChatPage = () => {
             onVoiceTranscript={handleVoiceTranscript}
             language={language}
             disabled={loading}
-            placeholder={
-              domain === "civic"
-                ? "Ask about Kenyan government services..."
-                : domain === "health"
-                ? "Ask about health, symptoms, or medical information..."
-                : "Speak or type to translate..."
-            }
+            placeholder="Type or speak text to translate..."
           />
           <p className="mt-2 text-center text-xs text-white/40">
-            Powered by Ollama • Supports Kenyan Languages • Voice Input Available
+            Text and voice translation available
           </p>
         </div>
       </div>

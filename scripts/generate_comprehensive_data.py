@@ -54,14 +54,14 @@ def generate_kenyan_phrases() -> List[Dict]:
         {"en": "Thank you very much", "sw": "Asante sana", "ki": "Wega nĩ ũgĩ", "lu": "Ahero ahinya"},
         {"en": "You're welcome", "sw": "Karibu", "ki": "Karibu", "lu": "Ber e"},
         
-        # Government/Civic
+        # Document/General
         {"en": "I need to register my business", "sw": "Nahitaji kusajili biashara yangu", "ki": "Ndingihitĩra gwĩka biashara yakwa", "lu": "Anahiyo kaw namba gi busines mare"},
         {"en": "Where do I get a birth certificate?", "sw": "Nawezaje kupata cheti cha kuzaliwa?", "ki": "Ndingikorũo gikundo kĩa mathĩ?"},
         {"en": "I want to apply for a passport", "sw": "Nataka kuomba pasipoti", "ki": "Ndingwenda gwĩka pasipoti"},
         {"en": "How do I pay taxes?", "sw": "Nawezaje kulipa ushuru?", "ki": "Ndingĩhĩrĩra shuru ĩta?"},
         {"en": "What is my county?", "sw": "Kaunti yangu ni ipi?", "ki": "Gatagatĩ gakwa nĩ gĩa nene?"},
         
-        # Health
+        # General
         {"en": "I have a fever", "sw": "Nina homa", "ki": "Ndirĩ na ng'aragu", "lu": "An gi moro"},
         {"en": "My head hurts", "sw": "Kichwa kinauma", "ki": "Mũtwe wakwa wathĩma", "lu": "Ot dhok"},
         {"en": "I need to see a doctor", "sw": "Nahitaji kumwona daktari", "ki": "Ndingihitĩra kũmwonerera daktari", "lu": "Anahiyo neno daktar"},
@@ -93,12 +93,12 @@ def generate_kenyan_phrases() -> List[Dict]:
     return result
 
 
-def generate_civic_qa() -> List[Dict]:
-    """Generate civic question-answer pairs."""
+def generate_general_qa() -> List[Dict]:
+    """Generate general question-answer pairs."""
     qa_pairs = [
         {
             "question_en": "What is the Constitution of Kenya?",
-            "answer_en": "The Constitution of Kenya is the supreme law of Kenya, promulgated in 2010. It establishes the framework for government with three arms: Executive, Legislature, and Judiciary. It also provides for 47 counties under devolution.",
+            "answer_en": "The Constitution of Kenya is the supreme law of Kenya, promulgated in 2010. It establishes the framework for document with three arms: Executive, Legislature, and Judiciary. It also provides for 47 counties under devolution.",
             "question_sw": "Katiba ya Kenya ni nini?",
             "answer_sw": "Katiba ya Kenya ni sheria kuu ya Kenya, iliyotangazwa mwaka 2010. Inaweka mfumo wa serikali wenye matawi matatu: Utendaji, Wanasheria, na Mahakama. Pia inaratibu kaunti 47 chini ya mgawanyo wa serikali."
         },
@@ -110,9 +110,9 @@ def generate_civic_qa() -> List[Dict]:
         },
         {
             "question_en": "What documents do I need for ID card?",
-            "answer_en": "For ID card (Huduma Namba): 1) Birth certificate, 2) Parents' IDs, 3) 2 passport photos, 4) KSh 100 fee, 5) Recommendation letter from chief. Process takes 2-4 weeks.",
+            "answer_en": "For ID card (Service Namba): 1) Birth certificate, 2) Parents' IDs, 3) 2 passport photos, 4) KSh 100 fee, 5) Recommendation letter from chief. Process takes 2-4 weeks.",
             "question_sw": "Nahitaji nyaraka gani kwa kitambulisho?",
-            "answer_sw": "Kwa kitambulisho (Huduma Namba): 1) Cheti cha kuzaliwa, 2) Vitambulisho vya wazazi, 3) Picha 2 za pasipoti, 4) Ada ya KSh 100, 5) Barua ya pendekezo kutoka kwa mkuu. Mchakato huchukua wiki 2-4."
+            "answer_sw": "Kwa kitambulisho (Service Namba): 1) Cheti cha kuzaliwa, 2) Vitambulisho vya wazazi, 3) Picha 2 za pasipoti, 4) Ada ya KSh 100, 5) Barua ya pendekezo kutoka kwa mkuu. Mchakato huchukua wiki 2-4."
         },
     ]
     
@@ -123,7 +123,7 @@ def generate_civic_qa() -> List[Dict]:
             'question': qa['question_en'],
             'answer': qa['answer_en'],
             'lang': 'english',
-            'domain': 'civic'
+            'domain': 'general'
         })
         # Swahili QA
         if 'question_sw' in qa:
@@ -131,7 +131,7 @@ def generate_civic_qa() -> List[Dict]:
                 'question': qa['question_sw'],
                 'answer': qa['answer_sw'],
                 'lang': 'swahili',
-                'domain': 'civic'
+                'domain': 'general'
             })
     return result
 
@@ -139,7 +139,7 @@ def generate_civic_qa() -> List[Dict]:
 def create_training_examples(memories: List[Dict], phrases: List[Dict], qa_pairs: List[Dict]) -> List[Dict]:
     """Create training examples in Ollama format."""
     examples = []
-    system_prompt = """You are Serikali Yangu AI - an assistant for Kenyan government services, healthcare, and civic information. You speak English, Swahili, Kikuyu, and Luo fluently. Always respond in the same language as the user."""
+    system_prompt = """You are Universal Translator AI - an assistant for translation services, voice translation, and general document information. You speak English, Swahili, Kikuyu, and Luo fluently. Always respond in the same language as the user."""
     
     # Translation examples
     all_translations = memories + phrases
@@ -177,7 +177,7 @@ def create_training_examples(memories: List[Dict], phrases: List[Dict], qa_pairs
         {"user": "Habari?", "assistant": "Mzima sana! Na wewe je? Nawezaje kukusaidia leo?"},
         {"user": "Ũhoro waku?", "assistant": "Ndamwega mũno! Nĩngwathenia atĩa rũũci wa kwĩ?"},
         {"user": "Idhi nade?", "assistant": "Ber nade! An apawa neno?"},
-        {"user": "I need help with ID", "assistant": "I can help you get an ID card. You need: 1) Birth certificate, 2) Passport photo, 3) KSh 100 fee, 4) Visit Huduma Centre. Process takes 2-4 weeks."},
+        {"user": "I need help with ID", "assistant": "I can help you get an ID card. You need: 1) Birth certificate, 2) Passport photo, 3) KSh 100 fee, 4) Visit support team. Process takes 2-4 weeks."},
     ]
     
     for conv in conversations:
@@ -205,9 +205,9 @@ def main():
     phrases = generate_kenyan_phrases()
     print(f"Generated {len(phrases)} phrase pairs")
     
-    # Generate civic QA pairs
-    print("Generating civic QA pairs...")
-    qa_pairs = generate_civic_qa()
+    # Generate general QA pairs
+    print("Generating general QA pairs...")
+    qa_pairs = generate_general_qa()
     print(f"Generated {len(qa_pairs)} QA pairs")
     
     # Create training examples

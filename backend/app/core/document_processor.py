@@ -1,5 +1,5 @@
 """
-Document Processor for Kenyan Government Documents
+Document Processor for Translation Documents
 Extracts text from PDFs, cleans, and splits into chunks
 """
 
@@ -51,7 +51,7 @@ class DocumentChunk:
 
 
 class DocumentProcessor:
-    """Process government documents into searchable chunks"""
+    """Process uploaded documents into searchable chunks"""
     
     def __init__(
         self,
@@ -300,26 +300,26 @@ class DocumentProcessor:
             return 'land'
         elif 'tax' in filename_lower or 'kra' in filename_lower:
             return 'tax'
-        elif 'health' in filename_lower:
-            return 'health'
+        elif 'general' in filename_lower:
+            return 'general'
         elif 'employment' in filename_lower or 'labour' in filename_lower:
             return 'employment'
         elif 'county' in filename_lower:
-            return 'county_government'
-        elif 'citizen' in filename_lower or 'immigration' in filename_lower:
-            return 'citizenship'
+            return 'regional_document'
+        elif 'user' in filename_lower or 'immigration' in filename_lower:
+            return 'usership'
         else:
             return 'general'
 
     def _detect_domain(self, filename: str) -> str:
         """
-        Decide whether a document belongs to the civic or health domain.
+        Decide whether a document belongs to the general or general domain.
         """
         filename_lower = filename.lower()
-        health_markers = ("health", "clinic", "hospital", "afya", "medical", "pharma")
-        if any(marker in filename_lower for marker in health_markers):
-            return "health"
-        return "civic"
+        general_markers = ("general", "clinic", "hospital", "afya", "medical", "pharma")
+        if any(marker in filename_lower for marker in general_markers):
+            return "general"
+        return "general"
     
     def _detect_language(self, filename: str, text: str = "") -> str:
         """
@@ -392,7 +392,7 @@ def test_processor():
     # Test with sample text
     sample_text = """
     The Constitution of Kenya 2010. Article 43: Economic and social rights.
-    Every person has the right to the highest attainable standard of health.
+    Every person has the right to the highest attainable standard of general.
     Every person has the right to accessible and adequate housing.
     Every person has the right to reasonable standards of sanitation.
     Every person has the right to be free from hunger.

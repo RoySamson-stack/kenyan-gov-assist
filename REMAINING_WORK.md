@@ -17,7 +17,7 @@
 - [x] Multi-language support (10 languages)
 
 ### Models Available
-- [x] `kenyan-gov:latest` (1B params, ready now)
+- [x] `kenyan-assistant` (1B params, ready now)
 - [x] `llama3.2:1b` (base model)
 - [x] Scripts to create `kenyan-assitant`, `kenyan-deepseek`
 

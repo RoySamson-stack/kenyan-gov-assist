@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 class TranslationService:
     """
-    Shared translation layer for Serikali Yangu (civic) and AfyaTranslate (health).
+    Shared translation layer for text, voice, and document workflows.
 
     The service loads phrase-level translation memories from `data/translations`,
-    applies domain-specific glossaries, and falls back to the unified Ollama model
+    applies optional domain glossaries, and falls back to the unified Ollama model
     for free-form translation.
     """
 
@@ -100,15 +100,11 @@ class TranslationService:
 
     def _build_system_prompt(self, domain: str) -> str:
         """Return domain-specific translation instructions."""
-        civic_prompt = (
-            "You are a professional translator for Kenyan government and civic information. "
-            "Honor official terminology, keep answers concise, and preserve legal accuracy."
+        return (
+            "You are a professional translation assistant. Preserve meaning, tone, "
+            "formatting cues, names, numbers, and important terminology. Return clear, "
+            "natural language suitable for the requested audience and domain."
         )
-        health_prompt = (
-            "You are AfyaTranslate, a Kenyan healthcare translation assistant. "
-            "Use compassionate tone, maintain medical accuracy, and highlight safety-critical instructions."
-        )
-        return health_prompt if domain == "health" else civic_prompt
 
     def _build_user_prompt(
         self,
@@ -152,11 +148,11 @@ class TranslationService:
         speaker_text: str,
         speaker_language: str,
         listener_language: str,
-        domain: str = "health",
+        domain: str = "general",
         include_backtranslation: bool = False,
     ) -> Dict[str, str]:
         """
-        Translate a snippet for two-party conversations (e.g., doctor/patient).
+        Translate a snippet for two-party conversations (e.g., speaker/listener).
         Returns both forward translation and optional back-translation for confirmation.
         """
         translation = await self.translate_text(

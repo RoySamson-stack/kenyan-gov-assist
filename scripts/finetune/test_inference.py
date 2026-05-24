@@ -68,7 +68,7 @@ def main():
 
     model, tokenizer = load_model(args.model_size, args.lora_path)
 
-    system = """You are Serikali Yangu, an AI assistant specialized in Kenyan government services. Respond in Swahili or English."""
+    system = """You are Universal Translator, an AI assistant specialized in translation services. Respond in Swahili or English."""
 
     print("\n=== Kenyan Gov Assistant (Fine-tuned) ===")
     print("Type 'quit' to exit\n")

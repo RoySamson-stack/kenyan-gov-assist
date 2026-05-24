@@ -78,7 +78,7 @@ if [ ! -f "backend/.env" ]; then
     echo ""
     echo "Creating .env file..."
     cat > backend/.env << EOL
-APP_NAME=Serikali Yangu - Kenyan Language AI
+APP_NAME=Universal Translation Assistant
 OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2:1b
 WHISPER_MODEL=base

@@ -11,7 +11,7 @@ services:
       - ollama_data:/root/.ollama
     networks:
       - kenyan-gov-network
-    healthcheck:
+    generalcheck:
       test: ["CMD", "curl", "-f", "http://localhost:11434"]
       interval: 30s
       timeout: 10s
@@ -19,7 +19,7 @@ services:
     command: >
       sh -c "ollama serve &
       sleep 5 &&
-      ollama pull kenyan-gov:latest &&
+      ollama pull kenyan-assistant &&
       wait"
 
   # Backend API service
@@ -32,15 +32,15 @@ services:
       - "8001:8001"
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - OLLAMA_MODEL=kenyan-gov:latest
-      - APP_NAME=Serikali Yangu - Kenyan Language AI
+      - OLLAMA_MODEL=kenyan-assistant
+      - APP_NAME=Universal Translation Assistant
       - CORS_ORIGINS=http://frontend:3000,http://localhost:3000
     volumes:
       - ./data:/app/data
       - ./models:/app/models
     depends_on:
       ollama:
-        condition: service_healthy
+        condition: service_generaly
     networks:
       - kenyan-gov-network
     restart: unless-stopped
